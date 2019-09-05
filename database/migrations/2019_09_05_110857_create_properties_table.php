@@ -19,7 +19,7 @@ class CreatePropertiesTable extends Migration
             $table->string('address');
             $table->string('file');
             $table->integer('price');
-            $table->string('type');
+            $table->integer('type');
             $table->timestamps();
         });
     }

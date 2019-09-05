@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Property;
 use Illuminate\Http\Request;
 
 class PropertiesController extends Controller
@@ -13,8 +14,9 @@ class PropertiesController extends Controller
      */
     public function index()
     {
+        $properties = Property::all();
 
-        return view('property.index');
+        return view('property.index', compact('properties'));
         //
 
     }
@@ -40,7 +42,20 @@ class PropertiesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($file = $request->file('photo'))
+        {
+            $name = time() . $file->getClientOriginalName();
+            $file->move('images', $name);
+            $photo = Photo::create(['file'=> $name]);
+            $input['photo_id'] = $photo->id;
+        }
+
+        $input = $request->all();
+
+        Property::create($input);
+        return $input;
+//        return redirect('/property');
+
     }
 
     /**
@@ -51,6 +66,10 @@ class PropertiesController extends Controller
      */
     public function show($id)
     {
+
+        $property = Property::find($id);
+        return $property;
+
         //
     }
 
@@ -63,8 +82,9 @@ class PropertiesController extends Controller
     public function edit($id)
     {
         //
+        $property = Property::findOrFail($id);
 
-        return view('property.edit');
+        return view('property.edit', compact('property'));
     }
 
     /**
@@ -77,6 +97,15 @@ class PropertiesController extends Controller
     public function update(Request $request, $id)
     {
         //
+
+
+        $property = Property::findOrFail($id);
+        $input = $request->all();
+//        dd($request);
+        $response = $property->update($input);
+        return json_encode($response);
+//        return Response::json( $property->update($input));
+
     }
 
     /**
@@ -87,6 +116,10 @@ class PropertiesController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+        $property = Property::find($id);
+
+        $property->delete();
+
     }
 }
